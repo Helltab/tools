@@ -3,9 +3,7 @@ package com.helltab.repo.tool.work.valid;
 
 import com.helltab.repo.tool.work.str.NullableUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
  * 3. 根据实际情况按 and or 的逻辑封装验证规则
  * 4. 调用包装类的 test 方法, 获取到包含最终结果的 ValidResult 对象
  */
-public class ValidUtil {
+public class VerifyUtil {
     /**
      * 生成统一格式的信息
      * todo 暂时不处理
@@ -35,27 +33,28 @@ public class ValidUtil {
         return msg;
     }
 
-    private static class ValidWrap implements ValidInf {
+    private static class VerifyWrap implements VerifyInf {
         Predicate<Object[]> predicate;
         private String msg;
         private final Object[] testValues;
         boolean flag = true;
+        boolean allowEmpty = false;
 
         /**
          * 构造函数
          *
-         * @param validFun
+         * @param verifyFun
          * @param testValues
          */
-        public ValidWrap(ValidFun validFun, Object[] testValues) {
-            this(validFun, validFun.getM(), testValues);
+        public VerifyWrap(VerifyFun verifyFun, Object[] testValues) {
+            this(verifyFun, verifyFun.getM(), testValues);
         }
 
-        public ValidWrap(ValidFun validFun, String msg, Object[] testValues) {
-            this(validFun.getP(), genMsg(msg), testValues);
+        public VerifyWrap(VerifyFun verifyFun, String msg, Object[] testValues) {
+            this(verifyFun.getP(), genMsg(msg), testValues);
         }
 
-        public ValidWrap(Predicate<Object[]> predicate, String msg, Object[] testValues) {
+        public VerifyWrap(Predicate<Object[]> predicate, String msg, Object[] testValues) {
             this.predicate = predicate;
             this.msg = genMsg(msg);
             this.testValues = testValues;
@@ -77,22 +76,30 @@ public class ValidUtil {
          * @return
          */
         @Override
-        public ValidResult test() {
+        public VerifyResult test() {
+            if (NullableUtil.isNull(this.testValues)
+                        || NullableUtil.isNull(this.testValues[0])
+                        || NullableUtil.isNull(this.testValues[0].toString())) {
+                if (this.allowEmpty) {
+                    return new VerifyResult(flag = true, "");
+                } else {
+                    return new VerifyResult(flag = false, "参数为空");
+                }
+
+            }
             if (flag = this.predicate.test(this.testValues)) {
                 msg = "";
             } else {
                 String collect = NullableUtil.isNull(this.testValues)
-                                         ? null : Arrays.stream(this.testValues).map(ValidWrap::getString).collect(Collectors.joining(", ", "[", "]"));
+                                         ? null : Arrays.stream(this.testValues).map(VerifyWrap::getString).collect(Collectors.joining(", ", "[", "]"));
                 msg += "(value: " + collect + ")";
             }
-            return new ValidResult(flag, msg);
+            return new VerifyResult(flag, msg);
         }
 
         @Override
-        public ValidInf empty() {
-            if (NullableUtil.isNull(this.testValues) || NullableUtil.isNull(this.testValues[0]) || NullableUtil.isNull(this.testValues[0].toString())) {
-                this.predicate = objs -> true;
-            }
+        public VerifyInf empty() {
+            this.allowEmpty = true;
             return this;
         }
     }
@@ -102,19 +109,19 @@ public class ValidUtil {
      *
      * @return
      */
-    public static ValidInf build() {
-        return new ValidForm();
+    public static VerifyInf build() {
+        return new VerifyForm();
     }
 
     /**
      * 验证主体
      *
-     * @param validFun
+     * @param verifyFun
      * @param testValues
      * @return
      */
-    public static ValidInf valid(ValidFun validFun, Object[] testValues) {
-        return new ValidWrap(validFun, testValues);
+    public static VerifyInf of(VerifyFun verifyFun, Object[] testValues) {
+        return new VerifyWrap(verifyFun, testValues);
     }
 
 
@@ -122,12 +129,12 @@ public class ValidUtil {
      * 验证主体
      * 自定义返回信息
      *
-     * @param validFun
+     * @param verifyFun
      * @param testValues
      * @return
      */
-    public static ValidInf validCustom(ValidFun validFun, String msg, Object[] testValues) {
-        return new ValidWrap(validFun, msg, testValues);
+    public static VerifyInf validCustom(VerifyFun verifyFun, String msg, Object[] testValues) {
+        return new VerifyWrap(verifyFun, msg, testValues);
     }
 
 
@@ -141,23 +148,16 @@ public class ValidUtil {
      * @param testValues
      * @return
      */
-    public static ValidInf validCustom(Predicate<Object[]> predicate, String msg, Object[] testValues) {
-        return new ValidWrap(predicate, msg, testValues);
+    public static VerifyInf validCustom(Predicate<Object[]> predicate, String msg, Object[] testValues) {
+        return new VerifyWrap(predicate, msg, testValues);
     }
 
 
     public static void main(String[] args) {
-        ValidInf inf = ValidUtil.build();
-        inf.and(ValidUtil.valid(ValidFun.PHONE, null).empty()
-                         .or(ValidUtil.valid(ValidFun.PHONE, new String[]{"176280929"}))
-                         .or(ValidUtil.valid(ValidFun.PHONE, new String[]{"1762809930"})))
-                     .or(ValidUtil.valid(ValidFun.PHONE, new String[]{"17628099"}));
-        ValidResult result = inf.test();
-        result = ValidUtil.build().and(ValidUtil.valid(ValidFun.PHONE, new String[]{null}).empty())
-                         .or(ValidUtil.valid(ValidFun.PHONE, new String[]{"176280929"}))
-                         .test();
+        VerifyInf inf = VerifyUtil.build();
+        VerifyResult result = inf.and(VerifyUtil.of(VerifyFun.PHONE, new String[]{null}).empty()).test();
 
-        ValidUtil.build().and(ValidUtil.validCustom(objs -> {
+        VerifyUtil.build().and(VerifyUtil.validCustom(objs -> {
 
             return true;
         }, "err", new String[]{"param"}));

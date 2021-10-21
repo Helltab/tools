@@ -12,65 +12,65 @@ import java.util.Objects;
  * @date 2021/2/24 9:47
  * @desc 表单验证
  */
-public class ValidForm implements ValidInf {
+public class VerifyForm implements VerifyInf {
     public List<String> msgList = new ArrayList<>();
 
     boolean flag = true;
 
     /**
      * 每一次 and 都调用了 test，计算结果
-     * @param validInf
+     * @param verifyInf
      * @return
      */
     @Override
-    public ValidInf and(ValidInf validInf) {
-        return innerValid(validInf, true);
+    public VerifyInf and(VerifyInf verifyInf) {
+        return innerValid(verifyInf, true);
     }
 
 
     /**
      * 每一次 or 都调用了 test，计算结果
-     * @param validInf
+     * @param verifyInf
      * @return
      */
     @Override
-    public ValidInf or(ValidInf validInf) {
-        return innerValid(validInf, false);
+    public VerifyInf or(VerifyInf verifyInf) {
+        return innerValid(verifyInf, false);
     }
 
     /**
      * 拼接测试结果
      *
-     * @param validInf
+     * @param verifyInf
      * @param isAnd
      * @return
      */
-    private ValidInf innerValid(ValidInf validInf, boolean isAnd) {
+    private VerifyInf innerValid(VerifyInf verifyInf, boolean isAnd) {
 
-        ValidResult result = validInf.test();
+        VerifyResult result = verifyInf.test();
         if (isAnd) {
             flag = result.isFlag() && flag;
         } else {
             // 短路运算 -- 只是验证结果短路，但是相应的检测信息会加上
             // 在 false or true 时，会返回错误信息，如果 true or false 情况不返回错误信息，就会不一致，所以带上了错误信息，但是以最终检验返回的 true 或 false 为准
             if (flag) {
-                return setMsgInfo(validInf, result);
+                return setMsgInfo(verifyInf, result);
             }
             flag = result.isFlag() || flag;
         }
-        return setMsgInfo(validInf, result);
+        return setMsgInfo(verifyInf, result);
     }
 
     /**
      * 汇总信息
      *
-     * @param validInf
+     * @param verifyInf
      * @param result
      * @return
      */
-    private ValidInf setMsgInfo(ValidInf validInf, ValidResult result) {
-        List<String> msgs = (validInf instanceof ValidForm)?
-                               ((ValidForm) validInf).msgList:
+    private VerifyInf setMsgInfo(VerifyInf verifyInf, VerifyResult result) {
+        List<String> msgs = (verifyInf instanceof VerifyForm)?
+                               ((VerifyForm) verifyInf).msgList:
                                result.getMsgList();
         msgs.forEach(m->{
             if (!Objects.isNull(m) && !this.msgList.contains(m)) {
@@ -86,12 +86,12 @@ public class ValidForm implements ValidInf {
      * @return
      */
     @Override
-    public ValidResult test() {
-        return new ValidResult(flag, msgList);
+    public VerifyResult test() {
+        return new VerifyResult(flag, msgList);
     }
 
     @Override
-    public ValidInf empty() {
+    public VerifyInf empty() {
         return this;
     }
 }

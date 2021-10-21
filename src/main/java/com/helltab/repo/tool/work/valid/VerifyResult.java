@@ -1,6 +1,7 @@
 package com.helltab.repo.tool.work.valid;
 
 import cn.hutool.json.JSONUtil;
+import com.helltab.repo.tool.work.str.NullableUtil;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Map;
  * @desc 验证结果
  */
 @Data
-public class ValidResult {
+public class VerifyResult {
     private boolean flag = true;
     private List<String> msgList = new ArrayList<>();
 
@@ -27,14 +28,16 @@ public class ValidResult {
         return JSONUtil.toJsonStr(tempWrap);
     }
 
-    public ValidResult(boolean flag, List<String> msgList) {
+    public VerifyResult(boolean flag, List<String> msgList) {
         this.flag = flag;
         this.msgList = msgList;
     }
 
-    public ValidResult(boolean flag, String msg) {
+    public VerifyResult(boolean flag, String msg) {
         this.flag = flag;
-        this.msgList.add(msg);
+        if(NullableUtil.isNotNull(msg)) {
+            this.msgList.add(msg);
+        }
     }
 
     @Override
