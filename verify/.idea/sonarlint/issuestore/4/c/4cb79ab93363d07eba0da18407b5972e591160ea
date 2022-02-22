@@ -1,0 +1,19 @@
+
+E
+java:S37404"/Provide the parametrized type for this generic.(Èß‘ž
+E
+java:S1066`"/Merge this if statement with the enclosing one.(í Äø
+\
+java:S1128"ARemove this unused import 'com.helltab.verify.code.VerifyResult'.(àðÄÐøÿÿÿÿ
+U
+java:S1128"?Remove this unused import 'com.helltab.verify.code.VerifyUtil'.(ý–¼õ
+T
+java:S1128">Remove this unused import 'com.helltab.verify.code.VerifyFun'.(Óï«Ë
+P
+java:S1118":Add a private constructor to hide the implicit public one.(çäÊŠ
+h
+java:S37763"RRefactor this method to reduce its Cognitive Complexity from 39 to the 15 allowed.(ã äÀ
+B
+java:S30119",This accessibility update should be removed.(˜ÂÓ˜
+B
+java:S3011b",This accessibility bypass should be removed.(Ã®·Ò
