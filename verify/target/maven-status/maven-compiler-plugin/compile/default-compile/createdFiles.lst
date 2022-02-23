@@ -1,0 +1,15 @@
+icu\helltab\itool\verify\Main.class
+icu\helltab\itool\verify\core\BaseVerifyRule.class
+icu\helltab\itool\verify\normal\MustKeyRule.class
+icu\helltab\itool\verify\core\VerifyInf.class
+icu\helltab\itool\verify\annotation\LikeQuery.class
+icu\helltab\itool\verify\util\VerifyU$InnerCourt.class
+icu\helltab\itool\verify\annotation\ParamVerify.class
+icu\helltab\itool\verify\normal\EmailRule.class
+icu\helltab\itool\verify\Main$Test.class
+icu\helltab\itool\verify\core\VerifyCourt.class
+icu\helltab\itool\verify\core\VerifyCourt$Result.class
+icu\helltab\itool\verify\util\NullableUtil.class
+icu\helltab\itool\verify\normal\NotNullRule.class
+icu\helltab\itool\verify\normal\PhoneRule.class
+icu\helltab\itool\verify\util\VerifyU.class
