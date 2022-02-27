@@ -1,11 +1,12 @@
 package icu.helltab.itool.verify.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import icu.helltab.itool.object.ThreadLocalUtil;
+import icu.helltab.itool.result.BaseResult;
 
 /**
  * 校验法庭
  * 承担校验的规则输入|流程控制|最终结果输出
+ *
  * @author helltab
  */
 public class VerifyCourt<T> {
@@ -13,6 +14,13 @@ public class VerifyCourt<T> {
     private VerifyInf<T> verifier;
     private BaseVerifyRule<T> rule;
 
+    static {
+        ThreadLocalUtil.set(new Result());
+    }
+
+    public static Result result() {
+        return ThreadLocalUtil.get(Result.class);
+    }
 
     protected VerifyCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
         this.param = param;
@@ -23,6 +31,7 @@ public class VerifyCourt<T> {
         }
         this.verifier = this.verifier.and(this.rule.getVerifier(), this.rule.getMsg(), param);
     }
+
     protected VerifyCourt() {
         this.verifier = o -> true;
     }
@@ -30,6 +39,7 @@ public class VerifyCourt<T> {
 
     /**
      * 串行连接新的校验法庭
+     *
      * @param court
      * @return
      */
@@ -40,6 +50,7 @@ public class VerifyCourt<T> {
 
     /**
      * 并行连接新的校验法庭
+     *
      * @param court
      * @return
      */
@@ -50,6 +61,7 @@ public class VerifyCourt<T> {
 
     /**
      * 串行连接规则
+     *
      * @param ruleClazz
      * @param param
      * @return
@@ -63,6 +75,7 @@ public class VerifyCourt<T> {
 
     /**
      * 并行连接规则
+     *
      * @param ruleClazz
      * @param param
      * @return
@@ -72,8 +85,10 @@ public class VerifyCourt<T> {
         this.verifier = this.verifier.or(rule.verifier, rule.msg, param);
         return this;
     }
+
     /**
      * 串行连接规则
+     *
      * @param rule
      * @param param
      * @return
@@ -82,8 +97,10 @@ public class VerifyCourt<T> {
         this.verifier = this.verifier.and(rule.verifier, rule.msg, param);
         return this;
     }
+
     /**
      * 串行连接规则
+     *
      * @param rule
      * @param param
      * @return
@@ -99,7 +116,8 @@ public class VerifyCourt<T> {
      * @return
      */
     public Result judge() {
-        return new Result(this.verifier.test(param));
+        this.verifier.test(param);
+        return result();
     }
 
     public T getParam() {
@@ -119,41 +137,19 @@ public class VerifyCourt<T> {
      * 校验结果
      * 因校验结果需要阻塞处理, 检验过程不会存在多线程的场景, 因此校验产生的错误信息记录到本地线程空间中
      */
-    public static class Result{
+    public static class Result extends BaseResult {
         private boolean pass;
-        private String msg;
-        private static ThreadLocal<List<String>> ERROR_MSG;
-
-        static {
-            ERROR_MSG = new ThreadLocal<>();
-            ERROR_MSG.set(new ArrayList<>());
+        @Override
+        public void errorDetail() {
+            this.pass = false;
         }
 
-        /**
-         * 追加错误信息
-         * @param msg
-         */
-        public static void error(String msg) {
-            ERROR_MSG.get().add(msg);
+        public Result() {
+            pass = true;
         }
-
-        /**
-         * 组装当前线程中的错误信息
-         * @param pass
-         */
-        public Result(boolean pass) {
-            this.pass = pass;
-            List<String> list = ERROR_MSG.get();
-            this.msg = list.toString();
-            list.clear();
-        }
-
         public boolean isPass() {
             return pass;
         }
 
-        public String getMsg() {
-            return msg;
-        }
     }
 }

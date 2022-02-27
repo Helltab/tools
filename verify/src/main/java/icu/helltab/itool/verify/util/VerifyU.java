@@ -1,6 +1,7 @@
 package icu.helltab.itool.verify.util;
 
 import cn.hutool.core.util.ReflectUtil;
+import icu.helltab.itool.object.NullableUtil;
 import icu.helltab.itool.verify.annotation.LikeQuery;
 import icu.helltab.itool.verify.annotation.ParamVerify;
 import icu.helltab.itool.verify.core.BaseVerifyRule;
@@ -45,19 +46,31 @@ public class VerifyU {
      * @param params
      * @return
      */
-    public static VerifyCourt.Result checkFields(Object params) {
+    public static VerifyCourt.Result checkFields(Object ...params) {
         VerifyCourt court = of();
-        Field[] fields = ReflectUtil.getFields(params.getClass());
+        for (Object param : params) {
+            processCheck(param, court);
+        }
+        return court.judge();
+    }
+
+    /**
+     * 审查过程
+     * @param param
+     * @param court
+     */
+    private static void processCheck(Object param, VerifyCourt court) {
+        Field[] fields = ReflectUtil.getFields(param.getClass());
         Map<String, Set<Object>> mustKeyMap = new HashMap<>();
         for (Field field : fields) {
             try {
                 field.setAccessible(true);
-                Object o = field.get(params);
+                Object o = field.get(param);
                 String fieldName = field.getName();
                 ParamVerify annotation = field.getAnnotation(ParamVerify.class);
                 if (null != annotation) {
                     String mustKey = annotation.mustKey();
-                    // 联合非空
+                    // 多字段联合非空
                     if (NullableUtil.isNotNull(mustKey)) {
                         Set<Object> set = mustKeyMap.get(mustKey);
                         // 初始化 set
@@ -92,7 +105,7 @@ public class VerifyU {
                 if (NullableUtil.isNotNull(o) && NullableUtil.isNotNull(likeQuery)) {
                     if (field.getType() == String.class) {
                         String value = (String) o;
-                        field.set(params, value.replaceAll(likeQuery.flag(), "%"));
+                        field.set(param, value.replaceAll(likeQuery.flag(), "%"));
                     }
 
                 }
@@ -108,8 +121,6 @@ public class VerifyU {
                 court.a(keyRule, null);
             }
         });
-
-        return court.judge();
     }
 
     /**

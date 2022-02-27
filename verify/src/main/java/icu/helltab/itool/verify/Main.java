@@ -1,6 +1,8 @@
 package icu.helltab.itool.verify;
 
 import cn.hutool.json.JSONUtil;
+import icu.helltab.itool.result.web.BaseHttpResult;
+import icu.helltab.itool.result.web.HttpStatusInf;
 import icu.helltab.itool.verify.annotation.LikeQuery;
 import icu.helltab.itool.verify.annotation.ParamVerify;
 import icu.helltab.itool.verify.core.VerifyCourt;
@@ -18,7 +20,8 @@ public class Main {
      */
     public static void main(String[] args) {
 //        test1();
-        test2();
+//        test2();
+        testResult();
     }
 
     private static void test1() {
@@ -48,9 +51,48 @@ public class Main {
 //        test.c = "176280929320";
         test.e = "a*";
         VerifyCourt.Result result = VerifyU.checkFields(test);
+        System.out.println(result);
         System.out.println(JSONUtil.toJsonPrettyStr(result));
     }
 
+    private static void testResult() {
+        HttpResult httpResult = new HttpResult();
+        Test test = new Test();
+        test.b = "33";
+//        test.c = "176280929320";
+        test.e = "a*";
+        httpResult.setData(test);
+        System.out.println(httpResult);
+    }
+    static class HttpResult extends BaseHttpResult{
+        @Override
+        protected HttpStatusInf initSuccessStatus() {
+            return HttpHttpStatus.SUCCESS;
+        }
+
+        @Override
+        protected HttpStatusInf initFailStatus() {
+            return HttpHttpStatus.FAIL;
+        }
+    }
+    enum HttpHttpStatus implements HttpStatusInf {
+        SUCCESS(8000, "success"), FAIL(8999, "fail");
+
+        private final int code;
+        private final String desc;
+        HttpHttpStatus(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+        @Override
+        public int getCode() {
+            return code;
+        }
+        @Override
+        public String getDesc() {
+            return desc;
+        }
+    }
     @Data
     static
     class Test {

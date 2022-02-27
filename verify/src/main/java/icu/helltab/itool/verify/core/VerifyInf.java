@@ -48,7 +48,7 @@ public interface VerifyInf<T> {
                 b = verifyInf.test(o);
             } else {
                 if (!(b = verifyInf.test(param))) {
-                    VerifyCourt.Result.error(msg + "<" + param + ">");
+                    VerifyCourt.result().error(msg + "<" + param + ">");
                 }
             }
             return isAnd ? a && b : a || b;

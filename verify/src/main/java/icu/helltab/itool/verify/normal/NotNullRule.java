@@ -1,7 +1,7 @@
 package icu.helltab.itool.verify.normal;
 
 import icu.helltab.itool.verify.core.BaseVerifyRule;
-import icu.helltab.itool.verify.util.NullableUtil;
+import icu.helltab.itool.object.NullableUtil;
 
 import java.util.Set;
 
