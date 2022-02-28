@@ -19,7 +19,7 @@ public class VerifyCourt<T> {
     }
 
     public static Result result() {
-        return ThreadLocalUtil.get(Result.class);
+        return ThreadLocalUtil.get(new Result());
     }
 
     protected VerifyCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {

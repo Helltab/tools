@@ -16,9 +16,15 @@ public class ThreadLocalUtil {
 
      private ThreadLocalUtil(){}
 
-    public static <T> T get(Class<T> tClass) {
+    @SuppressWarnings("unchecked")
+    public static <T> T get(T t) {
         Map<Class<T>, T> map = getMap();
-        return map.get(tClass);
+        T res = map.get(t.getClass());
+        if(null == res) {
+            res = t;
+            map.put((Class<T>) t.getClass(), res);
+        }
+        return res;
     }
 
     @SuppressWarnings("unchecked")
