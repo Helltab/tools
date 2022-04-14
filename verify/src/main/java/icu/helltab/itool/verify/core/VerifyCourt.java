@@ -9,10 +9,9 @@ import icu.helltab.itool.result.BaseResult;
  *
  * @author helltab
  */
-public class VerifyCourt<T> {
-    private T param;
-    private VerifyInf<T> verifier;
-    private BaseVerifyRule<T> rule;
+public class VerifyCourt {
+    private Object param;
+    private VerifyInf<Object> verifier;
 
     static {
         ThreadLocalUtil.set(new Result());
@@ -22,14 +21,13 @@ public class VerifyCourt<T> {
         return ThreadLocalUtil.get(new Result());
     }
 
-    protected VerifyCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
-        this.param = param;
-        this.rule = BaseVerifyRule.getInstance(ruleClazz);
+    protected <T> VerifyCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
+        BaseVerifyRule<T> instance = BaseVerifyRule.getInstance(ruleClazz);
         // 默认为 true, 添加到校验头节点
         if (null == this.verifier) {
             this.verifier = o -> true;
         }
-        this.verifier = this.verifier.and(this.rule.getVerifier(), this.rule.getMsg(), param);
+        this.verifier = this.verifier.and(instance.getVerifier(), instance.getMsg(), param);
     }
 
     protected VerifyCourt() {
@@ -43,7 +41,7 @@ public class VerifyCourt<T> {
      * @param court
      * @return
      */
-    public VerifyCourt<T> and(VerifyCourt<T> court) {
+    public VerifyCourt and(VerifyCourt court) {
         this.verifier = this.verifier.and(court.verifier, null, null);
         return this;
     }
@@ -54,7 +52,7 @@ public class VerifyCourt<T> {
      * @param court
      * @return
      */
-    public VerifyCourt<T> or(VerifyCourt<T> court) {
+    public VerifyCourt or(VerifyCourt court) {
         this.verifier = this.verifier.or(court.verifier, null, null);
         return this;
     }
@@ -66,9 +64,13 @@ public class VerifyCourt<T> {
      * @param param
      * @return
      */
-    public VerifyCourt<T> a(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
-        BaseVerifyRule<T> rule = new VerifyCourt<>(ruleClazz, param).getRule();
-        this.verifier = this.verifier.and(rule.verifier, rule.msg, param);
+    public <T> VerifyCourt and(Class<? extends BaseVerifyRule<T>> ruleClazz, T param)  {
+        try {
+            BaseVerifyRule<T> rule = BaseVerifyRule.build(ruleClazz);
+            this.verifier = this.verifier.and(rule.verifier, rule.msg, param);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -80,9 +82,13 @@ public class VerifyCourt<T> {
      * @param param
      * @return
      */
-    public VerifyCourt<T> o(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
-        BaseVerifyRule<T> rule = new VerifyCourt<>(ruleClazz, param).getRule();
-        this.verifier = this.verifier.or(rule.verifier, rule.msg, param);
+    public <T> VerifyCourt or(Class<? extends BaseVerifyRule<T>> ruleClazz, T param)  {
+        try {
+            BaseVerifyRule<T> rule = BaseVerifyRule.build(ruleClazz);
+            this.verifier = this.verifier.or(rule.verifier, rule.msg, param);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -93,7 +99,7 @@ public class VerifyCourt<T> {
      * @param param
      * @return
      */
-    public VerifyCourt<T> a(BaseVerifyRule<T> rule, T param) {
+    public <T> VerifyCourt and(BaseVerifyRule<T> rule, T param) {
         this.verifier = this.verifier.and(rule.verifier, rule.msg, param);
         return this;
     }
@@ -105,7 +111,7 @@ public class VerifyCourt<T> {
      * @param param
      * @return
      */
-    public VerifyCourt<T> o(BaseVerifyRule<T> rule, T param) {
+    public VerifyCourt or(BaseVerifyRule<Object> rule, Object param) {
         this.verifier = this.verifier.or(rule.verifier, rule.msg, param);
         return this;
     }
@@ -120,17 +126,14 @@ public class VerifyCourt<T> {
         return result();
     }
 
-    public T getParam() {
+    public Object getParam() {
         return param;
     }
 
-    public VerifyInf<T> getVerifier() {
+    public VerifyInf<Object> getVerifier() {
         return verifier;
     }
 
-    public BaseVerifyRule<T> getRule() {
-        return rule;
-    }
 
 
     /**

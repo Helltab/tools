@@ -2,6 +2,7 @@ package icu.helltab.itool.result;
 
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
+import icu.helltab.itool.object.NullableUtil;
 import icu.helltab.itool.object.StrUtil;
 
 import java.io.Serializable;
@@ -23,7 +24,7 @@ public abstract class BaseResult implements Serializable {
     private final ArrayList<String> msgList;
 
 
-    public BaseResult() {
+    protected BaseResult() {
         msgList = new ArrayList<>();
     }
 
@@ -37,7 +38,9 @@ public abstract class BaseResult implements Serializable {
     }
 
     public BaseResult setMsg(Object... msgArray) {
-        Arrays.stream(msgArray).distinct().forEach(x -> {
+        Arrays.stream(msgArray)
+                .filter(NullableUtil::isNotNull)
+                .distinct().forEach(x -> {
             msgList.add(x.toString());
         });
         return this;
@@ -59,7 +62,13 @@ public abstract class BaseResult implements Serializable {
      * @return
      */
     public final String getMsg() {
-        return msgList.isEmpty() ? msg : msgList.toString();
+        if (msgList.isEmpty()) {
+            return msg;
+        }
+        if (msgList.size() == 1) {
+            return msgList.get(0);
+        }
+        return msgList.toString();
     }
 
     @Override
@@ -68,6 +77,7 @@ public abstract class BaseResult implements Serializable {
         jsonConfig.setOrder(true);
         jsonConfig.setIgnoreError(true);
         jsonConfig.setIgnoreNullValue(false);
+
         return JSONUtil.toJsonStr(this, jsonConfig);
     }
 }

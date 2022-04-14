@@ -15,7 +15,7 @@ public interface VerifyInf<T> {
      * @param param
      * @return
      */
-    default VerifyInf<T> and(VerifyInf<T> verifyInf, String msg, T param) {
+    default <M> VerifyInf<T> and(VerifyInf<M> verifyInf, String msg, M param) {
         return calc(verifyInf, msg, param, true);
     }
 
@@ -27,7 +27,7 @@ public interface VerifyInf<T> {
      * @param param
      * @return
      */
-    default VerifyInf<T> or(VerifyInf<T> verifyInf, String msg, T param) {
+    default <M> VerifyInf<T> or(VerifyInf<M> verifyInf, String msg, M param) {
         return calc(verifyInf, msg, param, false);
     }
 
@@ -40,12 +40,12 @@ public interface VerifyInf<T> {
      * @param isAnd
      * @return
      */
-    default VerifyInf<T> calc(VerifyInf<T> verifyInf, String msg, T param, boolean isAnd) {
+    default <M> VerifyInf<T> calc(VerifyInf<M> verifyInf, String msg, M param, boolean isAnd) {
         return o -> {
-            boolean a = test(o);
+            boolean a = test((T)o);
             boolean b;
             if (null == msg) {
-                b = verifyInf.test(o);
+                b = verifyInf.test((M)o);
             } else {
                 if (!(b = verifyInf.test(param))) {
                     VerifyCourt.result().error(msg + "<" + param + ">");

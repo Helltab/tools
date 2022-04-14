@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface ParamVerify {
-    Class<? extends BaseVerifyRule<?>>[] rules() default {};
+   Class[] rules() default {};
 
     /**
      * 参数是否必须, 默认为必须

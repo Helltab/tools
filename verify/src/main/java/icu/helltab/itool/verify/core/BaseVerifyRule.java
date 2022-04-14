@@ -1,6 +1,8 @@
 package icu.helltab.itool.verify.core;
 
 
+import icu.helltab.itool.object.ThreadLocalUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +16,20 @@ public abstract class BaseVerifyRule<T> {
         RULE_MAP = new HashMap<>();
     }
 
+    public static <T> BaseVerifyRule<T> build(Class<? extends BaseVerifyRule<T>> clazz) {
+        try {
+            return ThreadLocalUtil.get(clazz.newInstance());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new BaseVerifyRule<T>() {
+            @Override
+            protected void initMsg() { }
+
+            @Override
+            protected void initVerify() { }
+        };
+    }
     public void setParamName(String paramName) {
 
     }

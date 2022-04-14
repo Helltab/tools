@@ -33,7 +33,7 @@ public class HttpPaged {
 
     private int pageNum;
     private int pageSize;
-    private int total;
+    private long total;
     private int from;
     private int to;
 
@@ -55,11 +55,11 @@ public class HttpPaged {
      *
      * @param total
      */
-    public void setTotal(int total) {
+    public void setTotal(long total) {
         this.total = total;
     }
 
-    public int getTotal() {
+    public long getTotal() {
         return total;
     }
 

@@ -12,9 +12,10 @@ import java.util.Map;
  * @date 2022/2/27 16:38
  */
 public class ThreadLocalUtil {
-     private static ThreadLocal<Object> TL = new ThreadLocal<>();
+    private static final ThreadLocal<Object> TL = new ThreadLocal<>();
 
-     private ThreadLocalUtil(){}
+
+    private ThreadLocalUtil(){}
 
     @SuppressWarnings("unchecked")
     public static <T> T get(T t) {
@@ -29,8 +30,6 @@ public class ThreadLocalUtil {
 
     @SuppressWarnings("unchecked")
     private static <T> Map<Class<T>, T> getMap() {
-        TL.remove();
-        TL = new ThreadLocal<>();
         Map<Class<T>, T> map = (Map<Class<T>, T>) TL.get();
         if (map == null) {
             map = new HashMap<>();
@@ -42,7 +41,6 @@ public class ThreadLocalUtil {
     /**
      * save ThreadLocal
      *
-     * @param t
      */
     @SuppressWarnings("unchecked")
     public static <T> void set(T t) {
@@ -56,4 +54,5 @@ public class ThreadLocalUtil {
     public static void remove() {
         TL.remove();
     }
+
 }

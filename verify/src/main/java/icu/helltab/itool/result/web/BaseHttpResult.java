@@ -17,13 +17,13 @@ import icu.helltab.itool.result.BaseResult;
  * @version 1.0
  * @date 2022/2/27 17:58
  */
-public abstract class BaseHttpResult extends BaseResult {
+public abstract class BaseHttpResult<T> extends BaseResult {
     private int code;
     private HttpPaged paged;
     /**
      * generic is unused
      */
-    private Object data;
+    private T data;
     private final HttpStatusInf successStatus;
     private final HttpStatusInf failStatus;
 
@@ -98,7 +98,7 @@ public abstract class BaseHttpResult extends BaseResult {
         return data;
     }
 
-    public BaseResult setData(Object data) {
+    public BaseResult setData(T data) {
         this.data = data;
         return this;
     }

@@ -11,8 +11,9 @@ public class MustKeyRule extends BaseVerifyRule<String> {
         this.msg = "-";
     }
 
-    public void setFieldName(String msg) {
-        this.msg = "这些字段不能同时为空[" + msg + "]";
+    @Override
+    public void setParamName(String paramName) {
+        this.msg = "这些字段不能同时为空[" + paramName + "]";
     }
 
     @Override

@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
  */
 public class VerifyU {
 
+    private VerifyU() {
+    }
 
     /**
      * 开启一个新的校验
@@ -32,11 +34,11 @@ public class VerifyU {
      * @return
      * @throws Exception
      */
-    public static <T> VerifyCourt<T> of(Class<? extends BaseVerifyRule<T>> rule, T param) {
+    public static <T> VerifyCourt of(Class<? extends BaseVerifyRule<T>> rule, T param) {
         return InnerCourt.getCourt(rule, param);
     }
 
-    public static <T> VerifyCourt<T> of() {
+    public static VerifyCourt of() {
         return InnerCourt.getCourt();
     }
 
@@ -49,6 +51,9 @@ public class VerifyU {
     public static VerifyCourt.Result checkFields(Object ...params) {
         VerifyCourt court = of();
         for (Object param : params) {
+            if(NullableUtil.isEmpty(param)
+                       || param.getClass().isPrimitive())
+                continue;
             processCheck(param, court);
         }
         return court.judge();
@@ -92,11 +97,11 @@ public class VerifyU {
                     if (annotation.must()) {
                         NotNullRule notNullRule = new NotNullRule();
                         notNullRule.setParamName(fieldName);
-                        court.a(notNullRule, Collections.singleton(o));
+                        court.and(notNullRule, Collections.singleton(o));
                     }
                     if (!NullableUtil.isEmpty(o)) {
-                        for (Class<? extends BaseVerifyRule<?>> clazz : annotation.rules()) {
-                            court.a(clazz, o);
+                        for (Class clazz : annotation.rules()) {
+                            court.and(clazz, o);
                         }
                     }
 
@@ -116,9 +121,9 @@ public class VerifyU {
         mustKeyMap.forEach((k, v) -> {
             if (null != v && !v.isEmpty()) {
                 MustKeyRule keyRule = new MustKeyRule();
-                String fieldName = v.stream().map(Object::toString).collect(Collectors.joining("|"));
-                keyRule.setFieldName(fieldName);
-                court.a(keyRule, null);
+                String paramName = v.stream().map(Object::toString).collect(Collectors.joining("|"));
+                keyRule.setParamName(paramName);
+                court.and(keyRule, null);
             }
         });
     }
@@ -126,11 +131,11 @@ public class VerifyU {
     /**
      * 内部类实例校验法庭
      *
-     * @param <T>
+     * @param
      */
-    private static class InnerCourt<T> extends VerifyCourt<T> {
+    private static class InnerCourt extends VerifyCourt {
 
-        protected InnerCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
+        protected<T> InnerCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
             super(ruleClazz, param);
         }
 
@@ -138,12 +143,12 @@ public class VerifyU {
             super();
         }
 
-        public static <T> VerifyCourt<T> getCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
-            return new InnerCourt<>(ruleClazz, param);
+        public static <T> VerifyCourt getCourt(Class<? extends BaseVerifyRule<T>> ruleClazz, T param) {
+            return new InnerCourt(ruleClazz, param);
         }
 
-        public static <T> VerifyCourt<T> getCourt() {
-            return new InnerCourt<>();
+        public static VerifyCourt getCourt() {
+            return new InnerCourt();
         }
     }
 }

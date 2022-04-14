@@ -1,6 +1,7 @@
 package icu.helltab.itool.verify;
 
 import cn.hutool.json.JSONUtil;
+import icu.helltab.itool.object.ThreadLocalUtil;
 import icu.helltab.itool.result.web.BaseHttpResult;
 import icu.helltab.itool.result.web.HttpStatusInf;
 import icu.helltab.itool.verify.annotation.LikeQuery;
@@ -11,6 +12,8 @@ import icu.helltab.itool.verify.normal.PhoneRule;
 import icu.helltab.itool.verify.util.VerifyU;
 import lombok.Data;
 
+import java.util.HashMap;
+
 public class Main {
     /**
      * 使用示例
@@ -19,26 +22,27 @@ public class Main {
      * @throws Exception
      */
     public static void main(String[] args) {
-//        test1();
-//        test2();
-        testResult();
+        test1();
+        ThreadLocalUtil.remove();
+//        System.exit(0);
+//        testResult();
     }
 
     private static void test1() {
         VerifyCourt.Result result;
         result = VerifyU.of(PhoneRule.class, "17628092930")
                          .and(VerifyU.of(PhoneRule.class, "17628092930")
-                                      .a(EmailRule.class, "3")
-                                      .a(EmailRule.class, "4")
-                                      .a(EmailRule.class, "5")
-                                      .a(EmailRule.class, "6")
-                                      .a(EmailRule.class, "7")
+                                      .and(EmailRule.class, "3")
+                                      .and(EmailRule.class, "4")
+                                      .and(EmailRule.class, "5")
+                                      .and(EmailRule.class, "6")
+                                      .and(EmailRule.class, "7")
                                       .and(VerifyU.of(PhoneRule.class, "17628092930")
-                                                   .o(EmailRule.class, "31")
-                                                   .o(EmailRule.class, "41")
-                                                   .o(EmailRule.class, "51")
-                                                   .o(EmailRule.class, "61")
-                                                   .o(EmailRule.class, "999@qq.com")
+                                                   .or(EmailRule.class, "31")
+                                                   .or(EmailRule.class, "41")
+                                                   .or(EmailRule.class, "51")
+                                                   .or(EmailRule.class, "61")
+                                                   .or(EmailRule.class, "999@qq.com")
 
                                       )
                          ).judge();
@@ -51,7 +55,6 @@ public class Main {
 //        test.c = "176280929320";
         test.e = "a*";
         VerifyCourt.Result result = VerifyU.checkFields(test);
-        System.out.println(result);
         System.out.println(JSONUtil.toJsonPrettyStr(result));
     }
 
